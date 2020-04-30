@@ -25,6 +25,10 @@ public extension ImageModable {
         }
     }
 
+    func padded(_ insets: UIEdgeInsets) -> ImageMod {
+        padded(top: insets.top, left: insets.left, bottom: insets.bottom, right: insets.right)
+    }
+
     func padded(by length: CGFloat) -> ImageMod {
         padded(top: length, left: length, bottom: length, right: length)
     }
@@ -43,18 +47,18 @@ public extension ImageModable {
         }
     }
 
-    func scaled(by multiplier: CGFloat) -> ImageMod {
+    func scaled(times multiplier: CGFloat) -> ImageMod {
         scaled(to: CGSize(width: info.canvasSize.width * multiplier,
                           height: info.canvasSize.height * multiplier)
         )
     }
 
     func scaled(width: CGFloat) -> ImageMod {
-        scaled(by: width / info.canvasSize.width)
+        scaled(times: width / info.canvasSize.width)
     }
 
     func scaled(height: CGFloat) -> ImageMod {
-        scaled(by: height / info.canvasSize.height)
+        scaled(times: height / info.canvasSize.height)
     }
 
     // MARK: Stack
@@ -74,6 +78,134 @@ public extension ImageModable {
             .padded(bottom: image.info.canvasSize.height)
             .with(image.padded(top: info.canvasSize.height))
     }
+}
+
+public extension Array where Element == ImageModable {
+
+    func zStack(_ alignment: UIView.ContentMode = .center) -> ImageMod {
+        guard let first = first?.mod else { return UIImage().mod }
+        return dropFirst().reduce(first, alignment.zStack)
+    }
+}
+
+private extension UIView.ContentMode {
+
+    func zStack(base: ImageModable, overlay: ImageModable) -> ImageMod {
+        base.zStack(
+            overlay
+                .scaled(to: scale(base.info.canvasSize, overlay.info.canvasSize))
+                .padded(padding(base.info.canvasSize, overlay.info.canvasSize))
+        )
+    }
+
+    func scale(_ canvas: CGSize, _ size: CGSize) -> CGSize {
+        switch self {
+        case .scaleToFill:
+            return canvas
+        case .scaleAspectFit:
+            return canvas.aspect < size.aspect
+                ? CGSize(width: canvas.width,
+                         height: size.height * canvas.width / size.width)
+                : CGSize(width: size.width * canvas.height / size.height,
+                         height: canvas.height)
+        case .scaleAspectFill:
+            return canvas.aspect > size.aspect
+                ? CGSize(width: canvas.width,
+                         height: size.height * canvas.width / size.width)
+                : CGSize(width: size.width * canvas.height / size.height,
+                         height: canvas.height)
+        default: return size
+        }
+    }
+
+    func padding(_ canvas: CGSize, _ size: CGSize) -> UIEdgeInsets {
+        UIEdgeInsets(top: top(canvas, size), left: left(canvas, size),
+                     bottom: bottom(canvas, size), right: right(canvas, size))
+    }
+
+    func top(_ canvas: CGSize, _ size: CGSize) -> CGFloat {
+        switch self {
+        case .top, .topLeft, .topRight, .scaleToFill:
+            return 0
+        case .center, .left, .right:
+            return (canvas.height - size.height) / 2
+        case .bottom, .bottomLeft, .bottomRight:
+            return canvas.height - size.height
+        case .scaleAspectFit:
+            return canvas.aspect < size.aspect
+                ? (canvas.height - size.height * canvas.width / size.width) / 2
+                : 0
+        case .scaleAspectFill:
+            return canvas.aspect > size.aspect
+                ? (canvas.height - size.height * canvas.width / size.width) / 2
+                : 0
+        default: return 0
+        }
+    }
+
+    func bottom(_ canvas: CGSize, _ size: CGSize) -> CGFloat {
+        switch self {
+        case .bottom, .bottomLeft, .bottomRight, .scaleToFill:
+            return 0
+        case .center, .left, .right:
+            return (canvas.height - size.height) / 2
+        case .top, .topLeft, .topRight:
+            return canvas.height - size.height
+        case .scaleAspectFit:
+            return canvas.aspect < size.aspect
+                ? (canvas.height - size.height * canvas.width / size.width) / 2
+                : 0
+        case .scaleAspectFill:
+            return canvas.aspect > size.aspect
+                ? (canvas.height - size.height * canvas.width / size.width) / 2
+                : 0
+        default: return 0
+        }
+    }
+
+    func left(_ canvas: CGSize, _ size: CGSize) -> CGFloat {
+        switch self {
+        case .left, .topLeft, .bottomLeft, .scaleToFill:
+            return 0
+        case .center, .top, .bottom:
+            return (canvas.width - size.width) / 2
+        case .right, .topRight, .bottomRight:
+            return canvas.width - size.width
+        case .scaleAspectFit:
+            return canvas.aspect > size.aspect
+                ? (canvas.width - size.width * canvas.height / size.height) / 2
+                : 0
+        case .scaleAspectFill:
+            return canvas.aspect < size.aspect
+                ? (canvas.width - size.width * canvas.height / size.height) / 2
+                : 0
+        default: return 0
+        }
+    }
+
+    func right(_ canvas: CGSize, _ size: CGSize) -> CGFloat {
+        switch self {
+        case .right, .topRight, .bottomRight, .scaleToFill:
+            return 0
+        case .center, .top, .bottom:
+            return (canvas.width - size.width) / 2
+        case .left, .topLeft, .bottomLeft:
+            return canvas.width - size.width
+        case .scaleAspectFit:
+            return canvas.aspect > size.aspect
+                ? (canvas.width - size.width * canvas.height / size.height) / 2
+                : 0
+        case .scaleAspectFill:
+            return canvas.aspect < size.aspect
+                ? (canvas.width - size.width * canvas.height / size.height) / 2
+                : 0
+        default: return 0
+        }
+    }
+}
+
+private extension CGSize {
+    var aspect: CGFloat { width / height }
 }
 
 // MARK: - Base modifications
