@@ -16,10 +16,6 @@ public struct ImageMod {
 
     var info: Info
     let draw: (Info) -> ()
-
-    public var image: UIImage {
-        UIGraphicsImageRenderer(size: info.canvasSize).image { _ in draw(info) }
-    }
 }
 
 extension ImageMod: ImageModable {
