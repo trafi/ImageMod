@@ -24,5 +24,8 @@ let package = Package(
         .target(
             name: "ImageMod",
             dependencies: []),
+        .testTarget(
+            name: "ImageModTests",
+            dependencies: ["ImageMod"]),
     ]
 )
