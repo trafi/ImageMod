@@ -18,6 +18,18 @@ public extension ImageModable {
         }
     }
 
+    // MARK: Shadowed
+
+    func shadowed(offset: CGPoint = .zero, blur: CGFloat, color: UIColor) -> ImageModable {
+        padded(top: blur - offset.y,
+               left: blur - offset.x,
+               bottom: blur + offset.y,
+               right: blur + offset.x)
+            .with {
+                $0.shadow = (offset, blur, color)
+            }
+    }
+
     // MARK: Padded
 
     func padded(top: CGFloat = 0, left: CGFloat = 0, bottom: CGFloat = 0, right: CGFloat = 0) -> ImageModable {
