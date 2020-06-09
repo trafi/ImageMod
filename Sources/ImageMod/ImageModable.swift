@@ -20,7 +20,7 @@ public extension ImageModable {
 
     // MARK: Shadowed
 
-    func shadowed(offset: CGPoint = .zero, blur: CGFloat, color: UIColor) -> ImageModable {
+    func shadowed(offset: CGPoint = .zero, blur: CGFloat, color: UIColor = UIColor.black.withAlphaComponent(1/3)) -> ImageModable {
         padded(top: blur - offset.y,
                left: blur - offset.x,
                bottom: blur + offset.y,

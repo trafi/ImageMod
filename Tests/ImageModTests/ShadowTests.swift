@@ -17,6 +17,17 @@ final class ShadowTests: ModTests {
         XCTAssertEqual(mod.info.drawRect, CGRect(x: 8, y: 6, width: 100, height: 100))
     }
 
+    func test_itUsesDefaultOffsetAndColor() {
+
+        _ = mod
+            .shadowed(blur: 10)
+            .image
+
+        XCTAssertEqual(mod.info.shadow?.offset, .zero)
+        XCTAssertEqual(mod.info.shadow?.blur, 10)
+        XCTAssertEqual(mod.info.shadow?.color, UIColor.black.withAlphaComponent(1/3))
+    }
+
     func testChaining_itUsesLastShadow() {
 
         _ = mod
@@ -24,7 +35,6 @@ final class ShadowTests: ModTests {
             .shadowed(blur: 20, color: .blue)
             .image
 
-        XCTAssertEqual(mod.info.shadow?.offset, .zero)
         XCTAssertEqual(mod.info.shadow?.blur, 20)
         XCTAssertEqual(mod.info.shadow?.color, .blue)
     }
