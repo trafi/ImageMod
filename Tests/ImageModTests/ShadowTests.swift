@@ -17,6 +17,20 @@ final class ShadowTests: ModTests {
         XCTAssertEqual(mod.info.drawRect, CGRect(x: 8, y: 6, width: 100, height: 100))
     }
 
+    func test_itHandlesOffsetLargerThanBlur() {
+
+        _ = mod
+            .shadowed(offset: CGPoint(x: 20, y: 40), blur: 10)
+            .image
+
+        XCTAssertEqual(mod.info.shadow?.offset, CGPoint(x: 20, y: 40))
+        XCTAssertEqual(mod.info.shadow?.blur, 10)
+
+        XCTAssertEqual(mod.info.canvasSize, CGSize(width: 130, height: 150))
+        XCTAssertEqual(mod.info.drawRect, CGRect(x: 0, y: 0, width: 100, height: 100))
+
+    }
+
     func test_itUsesDefaultOffsetAndColor() {
 
         _ = mod
