@@ -6,7 +6,7 @@ extension UIImage: ImageModable {
         ImageMod(info: .init(size),
                  draw: { info in
                     self.withTintColor(info.tint, optimizedFor: info.drawRect.size)
-                        .draw(in: info.drawRect)
+                        .draw(in: info.drawRect, with: info.shadow)
         })
     }
 
@@ -22,5 +22,20 @@ extension UIImage: ImageModable {
                 context.fill(rect, blendMode: .sourceIn)
             }
         }
+    }
+
+    private func draw(in rect: CGRect, with shadow: (offset: CGPoint, blur: CGFloat, color: UIColor)?) {
+
+        let ctx = UIGraphicsGetCurrentContext()!
+        ctx.saveGState()
+        defer { ctx.restoreGState() }
+
+        if let shadow = shadow {
+            ctx.setShadow(offset: CGSize(width: shadow.offset.x, height: shadow.offset.y),
+                          blur: shadow.blur,
+                          color: shadow.color.cgColor)
+        }
+
+        draw(in: rect)
     }
 }
