@@ -68,7 +68,7 @@ public extension ImageModable {
     // MARK: Stack
 
     func hStack(_ image: ImageModable?, spacing: CGFloat = 0, alignment: UIStackView.Alignment = .center) -> ImageModable {
-        guard let i = image else { return self }
+        guard let image = image else { return self }
         let rect = image.canvasSize.vAlign(in: canvasSize, alignment: alignment)
         return self
             .padded(right: rect.maxX + spacing)
@@ -81,7 +81,7 @@ public extension ImageModable {
     }
 
     func vStack(_ image: ImageModable?, spacing: CGFloat = 0, alignment: UIStackView.Alignment = .center) -> ImageModable {
-        guard let i = image else { return self }
+        guard let image = image else { return self }
         let rect = image.canvasSize.hAlign(in: canvasSize, alignment: alignment)
         return self
             .padded(bottom: rect.maxY + spacing)
@@ -94,7 +94,7 @@ public extension ImageModable {
     }
 
     func zStack(_ overlay: ImageModable?, alignment: UIView.ContentMode = .center) -> ImageModable {
-        guard let i = image else { return self }
+        guard let overlay = overlay else { return self }
         let rect = overlay.canvasSize.align(in: canvasSize, alignment: alignment)
         return with(overlay
             .scaled(to: rect.size)
